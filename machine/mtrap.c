@@ -64,7 +64,8 @@ void printm(const char* s, ...)
 static void send_ipi(uintptr_t recipient, int event)
 {
   if (((disabled_hart_mask >> recipient) & 1)) return;
-  atomic_or(&OTHER_HLS(recipient)->mipi_pending, event);
+  // atomic or
+  atomic_binop(&OTHER_HLS(recipient)->mipi_pending, event, res | (event));
   mb();
   *OTHER_HLS(recipient)->ipi = 1;
 }
@@ -125,7 +126,7 @@ static void send_ipi_many(uintptr_t* pmask, int event)
   for (uintptr_t i = 0, m = mask; m; i++, m >>= 1)
     if (m & 1)
       while (*OTHER_HLS(i)->ipi)
-        incoming_ipi |= atomic_swap(HLS()->ipi, 0);
+        incoming_ipi |= atomic_binop(HLS()->ipi, 0, (0)); // atomic swap
 
   // if we got an IPI, restore it; it will be taken after returning
   if (incoming_ipi) {
