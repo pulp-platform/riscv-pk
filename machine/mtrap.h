@@ -6,7 +6,7 @@
 #include "encoding.h"
 
 #ifdef __riscv_atomic
-# define MAX_HARTS 8 // arbitrary
+# define MAX_HARTS 16 // arbitrary
 #else
 # define MAX_HARTS 1
 #endif

@@ -107,7 +107,7 @@ static uintptr_t mcall_set_timer(uint64_t when)
 
 static void send_ipi_many(uintptr_t* pmask, int event)
 {
-  _Static_assert(MAX_HARTS <= 8 * sizeof(*pmask), "# harts > uintptr_t bits");
+  _Static_assert(MAX_HARTS <= 16 * sizeof(*pmask), "# harts > uintptr_t bits");
   uintptr_t mask = hart_mask;
   if (pmask)
     mask &= load_uintptr_t(pmask, read_csr(mepc));
