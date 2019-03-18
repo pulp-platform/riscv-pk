@@ -17,10 +17,14 @@ typedef struct { int lock; } spinlock_t;
 #define atomic_set(ptr, val) (*(volatile typeof(*(ptr)) *)(ptr) = val)
 #define atomic_read(ptr) (*(volatile typeof(*(ptr)) *)(ptr))
 
+static spinlock_t atomic_binop_lock = SPINLOCK_INIT;
+
 #define atomic_binop(ptr, inc, op) ({ \
  long flags = disable_irqsave(); \
+ spinlock_lock(&atomic_binop_lock); \
  typeof(*(ptr)) res = atomic_read(ptr); \
  atomic_set(ptr, op); \
+ spinlock_unlock(&atomic_binop_lock); \
  enable_irqrestore(flags); \
  res; })
 
